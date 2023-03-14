@@ -1,0 +1,44 @@
+cabal-version:      3.0
+name:               my-clippings-csv
+version:            0.1.0.0
+synopsis:           Convert Chinese 'My Clippings.txt' to CSV file.
+homepage:           https://github.com/sinofp/my-clippings-csv
+license:            BSD-2-Clause
+license-file:       LICENSE
+author:             sinofp
+maintainer:         sinofp@tuta.io
+category:           Text
+extra-source-files: CHANGELOG.md
+
+library
+    exposed-modules:  Parser, CSV
+    build-depends:    base ^>=4.16.4.0,
+                      megaparsec ^>=9.3.0,
+                      cassava ^>=0.5.3.0,
+                      text ^>=2.0.0,
+                      bytestring ^>=0.11.3.0,
+                      time ^>=1.11.0.0
+    hs-source-dirs:   src
+    default-language: Haskell2010
+
+executable my-clippings-csv
+    main-is:          Main.hs
+    build-depends:    base ^>=4.16.4.0,
+                      text ^>=2.0.0,
+                      bytestring ^>=0.11.3.0,
+                      megaparsec ^>=9.3.0,
+                      my-clippings-csv
+    hs-source-dirs:   app
+    default-language: Haskell2010
+
+test-suite my-clippings-csv-test
+    default-language: Haskell2010
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          MyLibTest.hs
+    build-depends:    base ^>=4.16.4.0,
+                      time ^>=1.11.0.0,
+                      megaparsec ^>=9.3.0,
+                      hspec ^>=2.10.0,
+                      hspec-megaparsec ^>=2.2.0,
+                      my-clippings-csv
