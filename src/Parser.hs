@@ -70,7 +70,7 @@ pClipping :: Parser Clipping
 pClipping = Clipping <$> pTitle <*> pAuthor <*> pLocation <*> pType <*> pUTCTime <*> pContent
 
 pFile :: Parser [Clipping]
-pFile = some pClipping
+pFile = some pClipping -- I can't strip UTF-8 BOM here because decodeUtf8 merged it with the first character
 
 pTitle :: Parser Text -- I can't stop at whitespace, so I must strip it.
 pTitle = T.strip <$> takeWhile1P (Just "标题") (not . isTitleEndMark) <* junks
