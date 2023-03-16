@@ -40,7 +40,9 @@ pDay = fromGregorian <$> L.decimal <* char '年' <*> L.decimal <* char '月' <*>
 pTime :: Parser TimeOfDay
 pTime = TimeOfDay <$> pHour <*> pMinute <*> pSecond
   where
-    pHour = (+) <$> (0 <$ string "上午" <|> 12 <$ string "下午") <*> L.decimal <* char ':'
+    pHour = (+) <$> (0 <$ string "上午" <|> 12 <$ string "下午") <*> (zero12 <$> L.decimal) <* char ':'
+    zero12 12 = 0 -- 上午12 -> 0，下午12 -> 12
+    zero12 x = x
     pMinute = L.decimal <* char ':'
     pSecond = L.decimal <* eol <* eol
 

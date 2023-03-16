@@ -34,7 +34,7 @@ main = hspec $
       it "consumes trailing junks" $
         pType `shouldConsumeAll` "笔记 | 添加于 "
 
-    describe "Date Parser" $ do
+    describe "Date & Time Parser" $ do
       it "returns Gregorian day" $
         parse pDay "" "2018年11月19日星期一 " `shouldParse` fromGregorian 2018 11 19
       it "consumes trailing junks after date" $
@@ -42,7 +42,11 @@ main = hspec $
       it "returns afternoon time of day" $
         parse pTime "" "下午2:23:42\n\n" `shouldParse` TimeOfDay 14 23 42
       it "returns morning time of day" $
-        parse pTime "" "上午12:09:07\r\n\r\n" `shouldParse` TimeOfDay 12 09 07
+        parse pTime "" "上午11:09:07\r\n\r\n" `shouldParse` TimeOfDay 11 09 07
+      it "returns 12 AM correctly" $
+        parse pTime "" "上午12:39:58\r\n\r\n" `shouldParse` TimeOfDay 0 39 58
+      it "returns 12 PM correctly" $
+        parse pTime "" "下午12:15:12\r\n\r\n" `shouldParse` TimeOfDay 12 15 12
       it "consumes trailing junks after time" $
         pTime `shouldConsumeAll` "下午4:13:41\r\n\r\n"
       it "returns UTCTime" $ -- I don't convert TimeZone
