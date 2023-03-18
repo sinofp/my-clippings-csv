@@ -78,7 +78,7 @@ pTitle :: Parser Text -- I can't stop at whitespace, so I must strip it.
 pTitle = T.strip <$> takeWhile1P (Just "标题") (not . isTitleEndMark) <* junks
   where
     isTitleEndMark c = c == '(' || c == '（' || c == '【' || c == '：'
-    junks = takeWhileP (Just "作者前的垃圾话") (/= '(') <* manyTill anySingle (try $ lookAhead $ pAuthor' <* eol)
+    junks = takeWhileP (Just "作者前的垃圾话") (/= '(') <* manyTill anySingle (try . lookAhead $ pAuthor' <* eol)
 
 pAuthor' :: Parser Text -- I can't stop at hspace, but there can be a hspace between name and origName
 pAuthor' = T.strip <$> (char '(' *> optional nation *> name <* optional origName <* char ')' <* hspace)
@@ -87,7 +87,7 @@ pAuthor' = T.strip <$> (char '(' *> optional nation *> name <* optional origName
     nation =
       choice
         [ between' '(' ')',
-          between' '（' '）', -- <* notFollowedBy (char ')'), -- (（安·兰德）)
+          between' '（' '）',
           between' '[' ']',
           between' '［' '］',
           between' '【' '】'

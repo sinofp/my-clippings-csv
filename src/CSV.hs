@@ -44,9 +44,9 @@ instance ToNamedRecord ReadwiseRow where
     namedRecord ["Title" .= title, "Author" .= author, "Highlight" .= highlight, "Note" .= note, "Location" .= loc, "Date" .= date]
 
 toRows :: [Clipping] -> [ReadwiseRow]
-toRows xs = go sorted
+toRows = go . sort
   where
-    sorted = sortOn (\case Clipping {loc, type_, content} -> (loc, type_, T.length content)) xs
+    sort = sortOn (\case Clipping {loc, type_, content} -> (loc, type_, T.length content))
     go [] = []
     go [x] = [to x Nothing] -- Branch for only one Highlight/Cut, since Note always comes with a Highlight
     go (x : xs@(y : ys))
@@ -56,7 +56,7 @@ toRows xs = go sorted
     to x = (title x,author x,content x,,loc x,utcToText $ date x)
     eqOn f = (==) `on` f
 
-toCSVs :: [Clipping] -> [(String, ByteString)]
+toCSVs :: [Clipping] -> [(FilePath, ByteString)]
 toCSVs xs = titles `zip` map toCSV grouped
   where
     grouped = groupWith title $ clean xs
