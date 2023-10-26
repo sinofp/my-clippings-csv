@@ -22,7 +22,8 @@ import System.FilePath
 data CmdOpt = CmdOpt
   { inputFile :: FilePath,
     outputDir :: FilePath,
-    removeJunk :: Bool
+    removeJunk :: Bool,
+    bom :: Bool
   }
 
 type OptReader = Reader CmdOpt
