@@ -23,7 +23,8 @@ data CmdOpt = CmdOpt
   { inputFile :: FilePath,
     outputDir :: FilePath,
     removeJunk :: Bool,
-    bom :: Bool
+    bom :: Bool,
+    list :: Bool
   }
 
 type OptReader = Reader CmdOpt
