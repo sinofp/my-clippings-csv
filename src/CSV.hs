@@ -7,6 +7,7 @@
 
 module CSV where
 
+import Control.Monad.Reader
 import Data.ByteString.Lazy (ByteString)
 import Data.Csv
 import Data.Function
@@ -16,6 +17,13 @@ import qualified Data.Text as T
 import Data.Time
 import GHC.Exts
 import Parser
+import System.FilePath
+
+data CmdOpt = CmdOpt
+  { inputFile :: FilePath,
+    outputDir :: FilePath,
+    removeJunk :: Bool
+  }
 
 ls :: [Clipping] -> [(Text, Text)]
 ls xs =
@@ -56,8 +64,11 @@ toRows = go . sort
     to x = (title x,author x,content x,,loc x,utcToText $ date x)
     eqOn f = (==) `on` f
 
-toCSVs :: [Clipping] -> [(FilePath, ByteString)]
-toCSVs xs = titles `zip` map toCSV grouped
+toCSVs :: [Clipping] -> Reader CmdOpt [(FilePath, ByteString)]
+toCSVs xs = do
+  outputDir <- asks outputDir
+  let fileNames = map (\x -> outputDir </> x <.> "csv") titles
+  pure $ fileNames `zip` map toCSV grouped
   where
     grouped = groupWith title $ clean xs
     titles = map (T.unpack . title . head) grouped -- FilePath is String

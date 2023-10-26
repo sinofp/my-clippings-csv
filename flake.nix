@@ -15,9 +15,12 @@
         default = pkgs.mkShell {
           packages = with pkgs.haskellPackages; [
             cabal-install
+            pkgs.ormolu
             (ghcWithPackages (ps: with ps; [
               megaparsec
               cassava
+              mtl
+              optparse-applicative
               hspec
               hspec-megaparsec
               haskell-language-server
