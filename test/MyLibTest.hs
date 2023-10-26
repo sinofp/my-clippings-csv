@@ -143,6 +143,15 @@ main = hspec $
               \==========\r\n"
             date = parseTimeOrError True defaultTimeLocale "%d %b %Y %l:%M:%S %p" "19 May 2022 8:36:00 PM"
          in parse pClipping "" text `shouldParse` Clipping "世界上最简单的会计书" "达雷尔·穆利斯" 152 Note date "Equity\n初始投资\n净值\n是一回事啊"
+      it "returns correct Clipping 4" $
+        let text =
+              "秦淮之夜（日本唯美派文学代表人物、备受周作人推崇的作家谷崎润一郎，首次被翻译引进的随笔集） (东瀛文人·印象中国) ([日]谷崎润一郎)\r\n\
+              \- 您在第 117 页（位置 #1805-1805）的标注 | 添加于 2022年11月24日星期四 上午11:49:14\r\n\
+              \\r\n\
+              \ <您已达到本内容的剪贴上限>\r\n\
+              \==========\r\n"
+            date = parseTimeOrError True defaultTimeLocale "%d %b %Y %l:%M:%S %p" "24 Nov 2022 11:49:14 AM"
+         in parse pClipping "" text `shouldParse` Clipping "秦淮之夜" "谷崎润一郎" 1805 Highlight date " <您已达到本内容的剪贴上限>"
   where
     shouldConsumeAll parser text = runParser' parser (initialState text) `succeedsLeaving` ""
     shouldParseAs parser text res = parse parser "" text `shouldParse` res

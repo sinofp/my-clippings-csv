@@ -25,22 +25,26 @@ data CmdOpt = CmdOpt
     removeJunk :: Bool
   }
 
+type OptReader = Reader CmdOpt
+
 ls :: [Clipping] -> [(Text, Text)]
 ls xs =
   [ (the title, the author)
-    | Clipping {title, author} <- clean xs,
+    | Clipping {title, author} <- xs,
       then group by
         (title, author)
       using
         groupWith
   ]
 
-clean :: [Clipping] -> [Clipping]
-clean =
-  filter $ \case
-    Clipping {type_ = Bookmark} -> False
-    Clipping {type_ = Highlight, content = " <您已达到本内容的剪贴上限>"} -> False
-    _ -> True
+clean :: [Clipping] -> OptReader [Clipping]
+clean xs = do
+  keepJunk <- asks $ not . removeJunk
+  let p = \case
+        Clipping {type_ = Bookmark} -> False
+        Clipping {type_ = Highlight, content = " <您已达到本内容的剪贴上限>"} -> keepJunk
+        _ -> True
+  pure $ filter p xs
 
 utcToText :: UTCTime -> Text
 utcToText = T.pack . formatTime defaultTimeLocale "%Y-%m-%d %H:%M:%S"
@@ -64,12 +68,12 @@ toRows = go . sort
     to x = (title x,author x,content x,,loc x,utcToText $ date x)
     eqOn f = (==) `on` f
 
-toCSVs :: [Clipping] -> Reader CmdOpt [(FilePath, ByteString)]
+toCSVs :: [Clipping] -> OptReader [(FilePath, ByteString)]
 toCSVs xs = do
+  grouped <- groupWith title <$> clean xs
+  let titles = map (T.unpack . title . head) grouped -- FilePath is String
   outputDir <- asks outputDir
   let fileNames = map (\x -> outputDir </> x <.> "csv") titles
   pure $ fileNames `zip` map toCSV grouped
   where
-    grouped = groupWith title $ clean xs
-    titles = map (T.unpack . title . head) grouped -- FilePath is String
     toCSV = encodeByName (header ["Title", "Author", "Highlight", "Note", "Location", "Date"]) . toRows
